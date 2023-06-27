@@ -362,11 +362,10 @@ abstract contract Assertions is Test {
         );
     }
 
-    function tickInBitMap(UniswapV3Pool pool, int24 tick_)
-        internal
-        view
-        returns (bool initialized)
-    {
+    function tickInBitMap(
+        UniswapV3Pool pool,
+        int24 tick_
+    ) internal view returns (bool initialized) {
         tick_ /= int24(pool.tickSpacing());
 
         int16 wordPos = int16(tick_ >> 8);

@@ -5,6 +5,7 @@ import "prb-math/PRBMath.sol";
 
 import "./FixedPoint128.sol";
 import "./LiquidityMath.sol";
+import "forge-std/console.sol";
 
 library Position {
     struct Info {
@@ -32,6 +33,9 @@ library Position {
         uint256 feeGrowthInside0X128,
         uint256 feeGrowthInside1X128
     ) internal {
+        // 更新的时候会结算当前已经获得的fee（两个token）
+        // 如果是首次添加，self.liquidity = 0
+        // 如果后续添加，feeGrowthInside0X128 - self.feeGrowthInside0LastX128 减去了首次添加之前的fee
         uint128 tokensOwed0 = uint128(
             PRBMath.mulDiv(
                 feeGrowthInside0X128 - self.feeGrowthInside0LastX128,
@@ -46,14 +50,18 @@ library Position {
                 FixedPoint128.Q128
             )
         );
-
+        console.log("self.liquidity", self.liquidity);
+        console.log("tokensOwed1", tokensOwed1);
+        console.log("feeGrowthInside1X128", feeGrowthInside1X128);
+        // 添加/删除流动性
         self.liquidity = LiquidityMath.addLiquidity(
             self.liquidity,
             liquidityDelta
         );
+        // 记录本次最新的fee
         self.feeGrowthInside0LastX128 = feeGrowthInside0X128;
         self.feeGrowthInside1LastX128 = feeGrowthInside1X128;
-
+        // 更新fee数量
         if (tokensOwed0 > 0 || tokensOwed1 > 0) {
             self.tokensOwed0 += tokensOwed0;
             self.tokensOwed1 += tokensOwed1;

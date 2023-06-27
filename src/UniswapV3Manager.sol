@@ -21,7 +21,9 @@ contract UniswapV3Manager is IUniswapV3Manager {
         factory = factory_;
     }
 
-    function getPosition(GetPositionParams calldata params)
+    function getPosition(
+        GetPositionParams calldata params
+    )
         public
         view
         returns (
@@ -51,10 +53,9 @@ contract UniswapV3Manager is IUniswapV3Manager {
         );
     }
 
-    function mint(MintParams calldata params)
-        public
-        returns (uint256 amount0, uint256 amount1)
-    {
+    function mint(
+        MintParams calldata params
+    ) public returns (uint256 amount0, uint256 amount1) {
         IUniswapV3Pool pool = getPool(params.tokenA, params.tokenB, params.fee);
 
         (uint160 sqrtPriceX96, , , , ) = pool.slot0();
@@ -64,7 +65,12 @@ contract UniswapV3Manager is IUniswapV3Manager {
         uint160 sqrtPriceUpperX96 = TickMath.getSqrtRatioAtTick(
             params.upperTick
         );
+        console.log("upperTick:");
+        console.logInt(params.upperTick);
 
+        console.log("lowerTick:");
+        console.logInt(params.lowerTick);
+        // 计算流动性、包含当前价格区间，则获取两个流动性小的值，当前价格初始化的时候设定
         uint128 liquidity = LiquidityMath.getLiquidityForAmounts(
             sqrtPriceX96,
             sqrtPriceLowerX96,
@@ -72,6 +78,7 @@ contract UniswapV3Manager is IUniswapV3Manager {
             params.amount0Desired,
             params.amount1Desired
         );
+        console.log("liquidity", liquidity);
 
         (amount0, amount1) = pool.mint(
             msg.sender,
@@ -86,15 +93,16 @@ contract UniswapV3Manager is IUniswapV3Manager {
                 })
             )
         );
+        console.log("amount0", amount0);
+        console.log("amount1", amount1);
 
         if (amount0 < params.amount0Min || amount1 < params.amount1Min)
             revert SlippageCheckFailed(amount0, amount1);
     }
 
-    function swapSingle(SwapSingleParams calldata params)
-        public
-        returns (uint256 amountOut)
-    {
+    function swapSingle(
+        SwapSingleParams calldata params
+    ) public returns (uint256 amountOut) {
         amountOut = _swap(
             params.amountIn,
             msg.sender,
@@ -113,7 +121,7 @@ contract UniswapV3Manager is IUniswapV3Manager {
     function swap(SwapParams memory params) public returns (uint256 amountOut) {
         address payer = msg.sender;
         bool hasMultiplePools;
-
+        // 如果使用到多个pool，会收取多个手续费
         while (true) {
             hasMultiplePools = params.path.hasMultiplePools();
 
@@ -195,7 +203,8 @@ contract UniswapV3Manager is IUniswapV3Manager {
             data,
             (IUniswapV3Pool.CallbackData)
         );
-
+        console.log("transferFrom.token0:", amount0);
+        console.log("transferFrom.token1:", amount1);
         IERC20(extra.token0).transferFrom(extra.payer, msg.sender, amount0);
         IERC20(extra.token1).transferFrom(extra.payer, msg.sender, amount1);
     }
@@ -211,7 +220,8 @@ contract UniswapV3Manager is IUniswapV3Manager {
         bool zeroForOne = tokenIn < tokenOut;
 
         int256 amount = zeroForOne ? amount0 : amount1;
-
+        console.log("swap.callback.amount:");
+        console.logInt(amount);
         if (data.payer == address(this)) {
             IERC20(tokenIn).transfer(msg.sender, uint256(amount));
         } else {

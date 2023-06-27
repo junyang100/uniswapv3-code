@@ -21,26 +21,24 @@ abstract contract TestUtils is Test, Assertions {
         tickSpacings[3000] = 60;
     }
 
-    function divRound(int128 x, int128 y)
-        internal
-        pure
-        returns (int128 result)
-    {
+    function divRound(
+        int128 x,
+        int128 y
+    ) internal pure returns (int128 result) {
         int128 quot = ABDKMath64x64.div(x, y);
         result = quot >> 64;
 
         // Check if remainder is greater than 0.5
-        if (quot % 2**64 >= 0x8000000000000000) {
+        if (quot % 2 ** 64 >= 0x8000000000000000) {
             result += 1;
         }
     }
 
     // Implements: https://github.com/Uniswap/v3-sdk/blob/b6cd73a71f8f8ec6c40c130564d3aff12c38e693/src/utils/nearestUsableTick.ts
-    function nearestUsableTick(int24 tick_, uint24 tickSpacing)
-        internal
-        pure
-        returns (int24 result)
-    {
+    function nearestUsableTick(
+        int24 tick_,
+        uint24 tickSpacing
+    ) internal pure returns (int24 result) {
         result =
             int24(divRound(int128(tick_), int128(int24(tickSpacing)))) *
             int24(tickSpacing);
@@ -82,28 +80,24 @@ abstract contract TestUtils is Test, Assertions {
         tick_ = nearestUsableTick(tick_, 60);
     }
 
-    function sqrtPToNearestTick(uint160 sqrtP_, uint24 tickSpacing)
-        internal
-        pure
-        returns (int24 tick_)
-    {
+    function sqrtPToNearestTick(
+        uint160 sqrtP_,
+        uint24 tickSpacing
+    ) internal pure returns (int24 tick_) {
         tick_ = TickMath.getTickAtSqrtRatio(sqrtP_);
         tick_ = nearestUsableTick(tick_, tickSpacing);
     }
 
-    function encodeError(string memory error)
-        internal
-        pure
-        returns (bytes memory encoded)
-    {
+    function encodeError(
+        string memory error
+    ) internal pure returns (bytes memory encoded) {
         encoded = abi.encodeWithSignature(error);
     }
 
-    function encodeSlippageCheckFailed(uint256 amount0, uint256 amount1)
-        internal
-        pure
-        returns (bytes memory encoded)
-    {
+    function encodeSlippageCheckFailed(
+        uint256 amount0,
+        uint256 amount1
+    ) internal pure returns (bytes memory encoded) {
         encoded = abi.encodeWithSignature(
             "SlippageCheckFailed(uint256,uint256)",
             amount0,

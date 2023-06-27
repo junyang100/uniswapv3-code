@@ -939,7 +939,9 @@ contract UniswapV3PoolTest is Test, UniswapV3PoolUtils {
     // INTERNAL
     //
     ////////////////////////////////////////////////////////////////////////////
-    function setupPool(PoolParams memory params)
+    function setupPool(
+        PoolParams memory params
+    )
         internal
         returns (
             LiquidityRange[] memory liquidity,

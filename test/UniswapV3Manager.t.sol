@@ -1079,11 +1079,9 @@ contract UniswapV3ManagerTest is Test, TestUtils {
         );
     }
 
-    function mintParams(IUniswapV3Manager.MintParams memory mint)
-        internal
-        pure
-        returns (IUniswapV3Manager.MintParams[] memory mints)
-    {
+    function mintParams(
+        IUniswapV3Manager.MintParams memory mint
+    ) internal pure returns (IUniswapV3Manager.MintParams[] memory mints) {
         mints = new IUniswapV3Manager.MintParams[](1);
         mints[0] = mint;
     }
@@ -1141,7 +1139,9 @@ contract UniswapV3ManagerTest is Test, TestUtils {
         );
     }
 
-    function setupPool(PoolParamsFull memory params)
+    function setupPool(
+        PoolParamsFull memory params
+    )
         internal
         returns (
             UniswapV3Pool pool_,
@@ -1181,7 +1181,9 @@ contract UniswapV3ManagerTest is Test, TestUtils {
         mints_ = params.mints;
     }
 
-    function setupPool(PoolParams memory params)
+    function setupPool(
+        PoolParams memory params
+    )
         internal
         returns (
             IUniswapV3Manager.MintParams[] memory mints_,
